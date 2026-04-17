@@ -6,7 +6,7 @@ ____________________________________
 Android plugin for Godot 4.2+.
 Pick one or more images from gallery or capture image from camera.
 
-See demo project [`plugin/demo/`](plugin/demo/) (Godot 4.2.0).
+See demo project [`plugin/demo/`](plugin/demo/) (Godot 4.6.2).
 
 **_NOTE:_** Starting in Godot 4.2, Android plugins built on the v1 architecture are now deprecated. Instead, Godot 4.2 introduces a new Version 2 (v2) architecture for Android plugins. This plugin is from now on build on Godot Plugin v2 system.
 
@@ -37,7 +37,7 @@ If there is no GodotGetImage release for your Godot version, you need to generat
 ```
 dependencies {
     // Update this to match your Godot engine version
-    implementation("org.godotengine:godot:4.2.0.stable")
+    implementation("org.godotengine:godot:4.6.2.stable")
 ```
 
 2. Compile the project:
@@ -66,7 +66,7 @@ It is preferable to set the image size to the maximum desired size before any im
 Permissions
 -----------
 
-The plugin should handle all permissions that is neede. If any problem set these permission in Godot editor -> Project -> Export window:
+The plugin should handle all permissions that is needed. If any problem set these permission in Godot editor -> Project -> Export window:
 
 *Read External Storage*
 

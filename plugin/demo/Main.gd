@@ -147,4 +147,3 @@ func _on_check_button_use_photo_picker_toggled(button_pressed):
 		plugin.setOptions(options)
 	else:
 		print(plugin_name, " plugin not loaded!")
-

@@ -11,7 +11,7 @@ val pluginPackageName = "com.gmail.lamelynx.godotgetimage"
 
 android {
     namespace = pluginPackageName
-    compileSdk = 33
+    compileSdk = 35
 
     buildFeatures {
         buildConfig = true
@@ -37,7 +37,7 @@ android {
 
 dependencies {
     // Update this to match your Godot engine version
-    implementation("org.godotengine:godot:4.2.0.stable")
+    implementation("org.godotengine:godot:4.6.2.stable")
     implementation("androidx.activity:activity-ktx:1.7.2")
 }
 
