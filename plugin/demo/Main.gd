@@ -17,7 +17,11 @@ func _ready():
 		plugin.connect("error", _on_error)
 		plugin.connect("permission_not_granted_by_user", _on_permission_not_granted_by_user)
 
-	
+		# Camera hardware is optional, so hide the camera button when absent
+		if not plugin.hasCamera():
+			$VBoxContainer/ButtonCamera.hide()
+
+
 func _on_ButtonGallery_pressed():
 	""" Select single images from gallery """
 	if plugin:
@@ -129,18 +133,6 @@ func _on_ButtonSetOptionsUseFrontCamera_pressed():
 	""" Set option for all following images """
 	var options = {
 		"use_front_camera": true
-	}
-	
-	if plugin:
-		plugin.setOptions(options)
-	else:
-		print(plugin_name, " plugin not loaded!")
-
-
-func _on_check_button_use_photo_picker_toggled(button_pressed):
-	""" Set option to use Photo picker when selecting image """
-	var options = {
-		"use_photo_picker": button_pressed
 	}
 	
 	if plugin:

@@ -53,13 +53,6 @@ text = "Set use_front_camera to true"
 layout_mode = 2
 text = "Set options to default"
 
-[node name="CheckButtonUsePhotoPicker" type="CheckButton" parent="VBoxContainer" unique_id=48863899]
-visible = false
-layout_mode = 2
-button_pressed = true
-text = "Use androidx Photo picker
-(Not yet implemented!)"
-
 [node name="AcceptDialog" type="AcceptDialog" parent="." unique_id=21468481]
 
 [connection signal="pressed" from="VBoxContainer/ButtonGallery" to="." method="_on_ButtonGallery_pressed"]
@@ -69,4 +62,3 @@ text = "Use androidx Photo picker
 [connection signal="pressed" from="VBoxContainer/ButtonSetOptions2" to="." method="_on_ButtonSetOptions2_pressed"]
 [connection signal="pressed" from="VBoxContainer/ButtonSetOptionsUseFrontCamera" to="." method="_on_ButtonSetOptionsUseFrontCamera_pressed"]
 [connection signal="pressed" from="VBoxContainer/ButtonResetOptions" to="." method="_on_ButtonResetOptions_pressed"]
-[connection signal="toggled" from="VBoxContainer/CheckButtonUsePhotoPicker" to="." method="_on_check_button_use_photo_picker_toggled"]

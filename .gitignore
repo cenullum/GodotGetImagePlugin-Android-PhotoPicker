@@ -103,3 +103,6 @@ lint/tmp/
 !plugin/demo/addons/GodotGetImage/bin/release/GodotGetImage-release.aar
 .godot/
 .import/
+
+# Local agent context, not for upstream
+CLAUDE.md

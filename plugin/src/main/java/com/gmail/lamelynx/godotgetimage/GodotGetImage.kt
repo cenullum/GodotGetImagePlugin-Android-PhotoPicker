@@ -32,6 +32,9 @@ import java.io.InputStream
 /**
  * Author: Lamelynx
  * Mail: lamelynx@gmail.com
+ *
+ * Photo Picker fork (Google Play compliant): cenullum
+ * https://github.com/cenullum
  */
 
 // Make this plugin compatible to other plugins that is using FileProvider()
@@ -59,7 +62,6 @@ class GodotGetImage(godot: Godot): GodotPlugin(godot) {
 
     private var tempImage: File? = null
     private var resendPermission = false
-    //private lateinit var myPhotoPicker:ActivityResultLauncher<PickVisualMediaRequest>
 
     // Options, sets by setOptions()
     private var imgHeight: Int? = null
@@ -71,40 +73,6 @@ class GodotGetImage(godot: Godot): GodotPlugin(godot) {
     private var useFrontCamera: Boolean = false
     // Available image format compression
     private var supportedImageFormats:List<String> = listOf("jpg", "png")
-    private var usePhotoPicker: Boolean = true
-
-    /*
-    init {
-        Log.d(TAG, "init GodotGetImage")
-        val tmp = PhotoPicker()
-        tmp.test()
-
-
-        if (isPhotoPickerAvailable(activity!!)) {
-            Log.d(TAG, "PhotoPicker is available on this device")
-
-            val tmp = androidx.activity.result.ActivityResult
-            // Registers a photo picker activity launcher in single-select mode.
-            myPhotoPicker = registerForActivityResult(PickVisualMedia()) { uri ->
-                // Callback is invoked after the user selects a media item or closes the
-                // photo picker.
-                if (uri != null) {
-                    Log.d(TAG, "Selected URI: $uri")
-                } else {
-                    Log.d(TAG, "No media selected")
-                }
-            }
-
-        } else {
-            // If photo picker is no available use old capturing method regardless what is set
-            // through setOptions() from Godot app.
-            usePhotoPicker = false
-            Log.d(TAG, "PhotoPicker is NOT available on this device")
-        }
-        
-
-
-    }*/
 
     @UsedByGodot
     private fun resendPermission() {
@@ -128,7 +96,6 @@ class GodotGetImage(godot: Godot): GodotPlugin(godot) {
             imageFormat = "jpg"
             autoRotateImage = false
             useFrontCamera = false
-            usePhotoPicker = true
         } else {
             Log.d(TAG, "Call - setOptions, Options:" + opt.keys + ", Values: " + opt.values)
             if ("image_width" in opt.keys) {
@@ -157,68 +124,63 @@ class GodotGetImage(godot: Godot): GodotPlugin(godot) {
             if ("use_front_camera" in opt.keys) {
                 useFrontCamera = opt["use_front_camera"] as Boolean
             }
-            if ("use_photo_picker" in opt.keys) {
-                usePhotoPicker = opt["use_photo_picker"] as Boolean
-            }
         }
     }
 
     @UsedByGodot
     fun getGalleryImage() {
         /**
-         * Select single image from gallery
+         * Select single image from gallery via the permission-free Android Photo Picker.
          * Returns godot Dictionary of one image as ByteArray
          */
-
-        Log.d(TAG, "Call - getGalleryImage")
-        /*
-        if (usePhotoPicker){
-            myPhotoPicker.launch(PickVisualMediaRequest(PickVisualMedia.ImageOnly))
-            return
-        }
-        */
-
-        // Android 13 changed permissions to READ_MEDIA_STORAGE
-        val permissionToRequest =
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-                Manifest.permission.READ_MEDIA_IMAGES
-            } else {
-                Manifest.permission.READ_EXTERNAL_STORAGE
-            }
-
-        // Check permission
-        if (getPermission(permissionToRequest)) {
-            val intent = Intent(Intent.ACTION_PICK)
-            intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
-            intent.type = "image/*"
-            activity?.startActivityForResult(intent, REQUEST_GALLERY_IMAGE_ID)
-        }
+        Log.d(TAG, "Call - getGalleryImage (photo picker, no permission)")
+        val intent = buildGalleryIntent(allowMultiple = false)
+        activity?.startActivityForResult(intent, REQUEST_GALLERY_IMAGE_ID)
     }
 
     @UsedByGodot
     fun getGalleryImages() {
         /**
-         * Select multiple images from gallery
+         * Select multiple images from gallery via the permission-free Android Photo Picker.
          * Returns godot Dictionary of selected images as ByteArray
          */
-        Log.d(TAG, "Call - getGalleryImages")
+        Log.d(TAG, "Call - getGalleryImages (photo picker, no permission)")
+        val intent = buildGalleryIntent(allowMultiple = true)
+        activity?.startActivityForResult(intent, REQUEST_GALLERY_IMAGE_ID)
+    }
 
-        // Android 13 changed permissions to READ_MEDIA_STORAGE
-        val permissionToRequest =
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-                Manifest.permission.READ_MEDIA_IMAGES
-            } else {
-                Manifest.permission.READ_EXTERNAL_STORAGE
+    private fun buildGalleryIntent(allowMultiple: Boolean): Intent {
+        /**
+         * Build a permission-free image picker intent.
+         * Android 13+ (API 33): system Photo Picker (ACTION_PICK_IMAGES).
+         * API 21-32: Storage Access Framework document picker (ACTION_OPEN_DOCUMENT).
+         */
+        return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            Intent(MediaStore.ACTION_PICK_IMAGES).apply {
+                type = "image/*"
+                if (allowMultiple) {
+                    // Allow as many images as this device's photo picker permits
+                    putExtra(MediaStore.EXTRA_PICK_IMAGES_MAX, MediaStore.getPickImagesMaxLimit())
+                }
             }
-
-        // Check permission
-        if (getPermission(permissionToRequest)) {
-            val intent = Intent(Intent.ACTION_PICK)
-            intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
-            intent.putExtra(Intent.EXTRA_ALLOW_MULTIPLE, true)
-            intent.type = "image/*"
-            activity?.startActivityForResult(intent, REQUEST_GALLERY_IMAGE_ID)
+        } else {
+            Intent(Intent.ACTION_OPEN_DOCUMENT).apply {
+                addCategory(Intent.CATEGORY_OPENABLE)
+                type = "image/*"
+                addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+                if (allowMultiple) putExtra(Intent.EXTRA_ALLOW_MULTIPLE, true)
+            }
         }
+    }
+
+    @UsedByGodot
+    fun hasCamera(): Boolean {
+        /**
+         * Runtime check whether the device has any camera.
+         * Relevant because android.hardware.camera is declared required="false".
+         */
+        return activity?.packageManager
+            ?.hasSystemFeature(PackageManager.FEATURE_CAMERA_ANY) ?: false
     }
 
     @UsedByGodot
