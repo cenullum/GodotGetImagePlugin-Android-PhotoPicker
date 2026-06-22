@@ -14,6 +14,8 @@ image from the camera.
 > user picks a single photo) are rejected by Google Play when they request the
 > restricted `READ_MEDIA_IMAGES` / `READ_MEDIA_VIDEO` permissions. The Photo
 > Picker needs none of them.
+<img width="928" height="669" alt="image" src="https://github.com/user-attachments/assets/0ce868e4-ec65-47d7-bd8f-eb129c21eb35" />
+
 
 What is the Android Photo Picker?
 ---------------------------------
